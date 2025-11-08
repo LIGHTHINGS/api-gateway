@@ -1,0 +1,46 @@
+{
+  "protocol": "https",
+  "port": 8443,
+
+  "routes": [
+    { 
+      "path": "/users", 
+      "target": "http://localhost:3001",
+      "auth": { "required": true, "roles": ["admin"]  }
+  },
+    { "path": "/billing", "target": "http://localhost:3002" },
+    { "path": "/transfer", "target": "http://localhost:3003" }
+  ],
+
+  "middlewares": {
+    "logger": { "enabled": true, "format": "[Gateway] :method :url - :time ms" },
+    "auth": { "enabled": true, "secret": "supersecretkey", "header": "x-api-key" },
+    "cors": { "enabled": true, "origin": "*" }
+  },
+
+  "cache": {
+    "enabled": true,
+    "ttl": 30,
+    "store": "memory"
+  },
+
+  "authorization": {
+    "enabled": true,
+    "roles": {
+      "admin": ["/billing"],
+      "user": ["/users"]
+    }
+  },
+
+  "tracing": {
+    "enabled": true,
+    "provider": "opentelemetry",
+    "serviceName": "vamp-gateway"
+  },
+
+  "monitoring": {
+    "enabled": true,
+    "metricsPath": "/metrics",
+    "collectInterval": 5000
+  }
+}
